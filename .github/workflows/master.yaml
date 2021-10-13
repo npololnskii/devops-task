@@ -29,6 +29,11 @@ jobs:
         with:
           exec: helm plugin install https://github.com/hypnoglow/helm-s3.git
 
+      - name: Helm package
+        uses: WyriHaximus/github-action-helm3@v2
+        with:
+          exec: helm package s3_explorer/deploy/helm/s3-explorer/
+
       - name: Docker build 
         run: docker build -t s3-explorer -f s3_explorer/Dockerfile s3_explorer/
       
