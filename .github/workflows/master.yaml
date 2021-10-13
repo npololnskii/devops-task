@@ -1,0 +1,32 @@
+on:
+  push:
+    branches:
+      - master
+name: master-build
+jobs:
+  test:
+    strategy:
+      matrix:
+        
+        go-version: [1.17.x]
+        platform: [ubuntu-latest]
+        image-name: s3-explorer
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Docker build 
+        run: docker build -t ${{ matrix.image-name }} -f s3_explorer/Dockerfile s3_explorer/
+
+      - name: Configure AWS credentials dev account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-1
