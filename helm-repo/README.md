@@ -16,12 +16,12 @@ terraform apply "start"
 
 ```bash
 # Install helm s3 plugin
-helm3 plugin install https://github.com/hypnoglow/helm-s3.git
+helm plugin install https://github.com/hypnoglow/helm-s3.git
 
 # Init repo
-helm3 s3 init s3://helm-tests/charts
+helm s3 init s3://helm-tests/charts
 
 # Add repo 
-helm3 repo add my-charts s3://helm-tests/charts
+helm repo add my-charts s3://helm-tests/charts
 ```
 Thats it, now you are ready to push charts. 
