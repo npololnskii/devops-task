@@ -1,0 +1,70 @@
+{{- $root := . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "s3-explorer.fullname" . }}
+  labels:
+    {{- include "s3-explorer.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "s3-explorer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "s3-explorer.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: {{  range .Values.configuration.args }}
+            - {{ . -}}
+            {{ end }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+{{- if .Values.configuration.env }}
+          env:
+            {{- if .Values.configuration.env.secret}}
+            {{- range $key, $val := .Values.configuration.env.secret }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ include "s3-explorer.fullname" $root }}"
+                  key: {{ $key }}
+            {{- end}}
+            {{- end}}
+            {{- if .Values.configuration.env.normal }}
+            {{- range $key, $val := .Values.configuration.env.normal }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end}}
+            {{- end}}
+{{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /isready
+              port: 8080
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
