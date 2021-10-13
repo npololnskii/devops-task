@@ -3,12 +3,12 @@ resource "aws_s3_bucket" "helm" {
   bucket = var.bucket_name
   acl    = "private"
 
-  /*logging {
+  logging {
     content {
       target_bucket = var.logging_bucket
       target_prefix = var.bucket_name
     }
-  }*/
+  }
 
   server_side_encryption_configuration {
     rule {
