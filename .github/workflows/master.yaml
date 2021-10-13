@@ -10,7 +10,7 @@ jobs:
         
         go-version: [1.17.x]
         platform: [ubuntu-latest]
-        image-name: s3-explorer
+        image-name: "s3-explorer"
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Install Go
