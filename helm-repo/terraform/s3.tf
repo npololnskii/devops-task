@@ -3,12 +3,12 @@ resource "aws_s3_bucket" "helm" {
   bucket = var.bucket_name
   acl    = "private"
 
-  logging {
+  /*logging {
     content {
       target_bucket = var.logging_bucket
       target_prefix = var.bucket_name
     }
-  }
+  }*/
 
   server_side_encryption_configuration {
     rule {
@@ -36,7 +36,8 @@ data "aws_iam_policy_document" "rw_policy" {
       sid = "Access for IAM entities"
       actions = [
         "s3:GetObject*",
-        "s3:PutObject*"
+        "s3:PutObject*",
+        "s3:DeleteObject*"
       ]
       effect    = "Allow"
       resources = ["${aws_s3_bucket.helm.arn}/*"]
@@ -52,4 +53,13 @@ data "aws_iam_policy_document" "rw_policy" {
 resource "aws_s3_bucket_policy" "this" {
   bucket = aws_s3_bucket.helm.id
   policy = data.aws_iam_policy_document.rw_policy.json
+}
+
+resource "aws_s3_bucket_public_access_block" "helm" {
+  bucket = aws_s3_bucket.helm.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
