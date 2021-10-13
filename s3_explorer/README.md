@@ -41,6 +41,18 @@ GET /isready
 
 Checks s3 api availabilty and returns if app is ready for request proccessing
 
+## Build 
+Assume that golang is already installed on your PC. 
+```bash
+go get -d -v ./...
+go build -o app
+```
+
+To build docker image run 
+```bash
+docker build -t s3-explorer .
+```
+
 ## Deployment 
 This tool can be deployed into k8s cluster with helm chart. 
 
@@ -56,6 +68,29 @@ Some helm chart values:
 | livenessProbe | object |  |livenessProbe configuration|
 | readinessProbe | object |  |readinessProbe configuration|
 
+Prepare custom values file:
+``` yaml
+image:
+  repository: s3-explorer
+configuration:
+  args:
+    - "--bucket=your-bucket-name"
+    - "--max_files=10"
+  env:
+    normal:
+      AWS_DEFAULT_REGION: us-east-1
+```
 
-### Deployment example
+Run install 
+```bash
+helm install test s3-explorer/ -f your-values.yaml
+```
 
+How to install with credentials as env vars
+```bash
+helm install test s3-explorer/ -f your-values.yaml --set configuration.env.secret.AWS_ACCESS_KEY_ID=your-key-id --set configuration.env.secret.AWS_SECRET_ACCESS_KEY=your-key
+```
+
+Even though AWS_SECRET_ACCESS_KEY and AWS_ACCESS_KEY_ID will be stored as secret with type=Opaque its the wrong way to deal with credentials. 
+
+Please consider using IAM instance profiles or some secrets storage. 
