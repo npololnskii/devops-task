@@ -83,12 +83,12 @@ configuration:
 
 Run install 
 ```bash
-helm install test s3-explorer/ -f your-values.yaml
+helm install test deploy/helm/s3-explorer/ -f your-values.yaml
 ```
 
 How to install with credentials as env vars
 ```bash
-helm install test s3-explorer/ -f your-values.yaml --set configuration.env.secret.AWS_ACCESS_KEY_ID=your-key-id --set configuration.env.secret.AWS_SECRET_ACCESS_KEY=your-key
+helm install test deploy/helm/s3-explorer/ -f your-values.yaml --set configuration.env.secret.AWS_ACCESS_KEY_ID=your-key-id --set configuration.env.secret.AWS_SECRET_ACCESS_KEY=your-key
 ```
 
 Even though AWS_SECRET_ACCESS_KEY and AWS_ACCESS_KEY_ID will be stored as secret with type=Opaque its the wrong way to deal with credentials. 
