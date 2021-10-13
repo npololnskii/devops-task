@@ -38,10 +38,20 @@ jobs:
         run: docker build -t s3-explorer -f s3_explorer/Dockerfile s3_explorer/
       
 
-      #- name: Configure AWS credentials dev account
-      #  uses: aws-actions/configure-aws-credentials@v1
-      #  with:
-      #    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #    aws-region: us-west-1
+      - name: Configure AWS credentials dev account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-1
+
+      - name: Helm add-repo
+        uses: WyriHaximus/github-action-helm3@v2
+        with:
+          exec: helm repo add s3://helm-tests/charts s3-repo
+
+      - name: Helm package
+        uses: WyriHaximus/github-action-helm3@v2
+        with:
+          exec: helm s3 push s3_explorer/deploy/helm/s3-explorer-*.tgz  s3-repo
 
